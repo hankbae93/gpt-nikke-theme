@@ -1,0 +1,112 @@
+/**
+ * Chatting Mode - NIKKE Blabla theme
+ * Scoped under body.llm-nikke-chatting
+ *
+ * Background/header/sidebar: handled by dynamic <style> tag in chatting.js
+ * This file: bubble styling + text fix + composer accent
+ */
+
+/* === Assistant (left) bubbles - blabla white NPC style === */
+body.llm-nikke-chatting [data-message-author-role="assistant"] {
+  position: relative;
+  padding-left: 48px !important;
+}
+
+body.llm-nikke-chatting [data-message-author-role="assistant"] .markdown.prose {
+  color: #333 !important;
+}
+
+body.llm-nikke-chatting [data-message-author-role="assistant"] .markdown.prose *:not(code) {
+  color: inherit !important;
+}
+
+body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown.prose {
+  background: #ffffff !important;
+  border-radius: 18px 18px 18px 4px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+/* Name label above bubble */
+body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown.prose::before {
+  content: 'Enik';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  line-height: 1;
+}
+
+/* Tail on left side */
+body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown.prose::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+}
+
+/* === User (right) bubbles - blabla orange with tail === */
+body.llm-nikke-chatting .user-message-bubble-color {
+  background: #f5a623 !important;
+  color: #fff !important;
+  border-radius: 18px 18px 4px 18px !important;
+  box-shadow: 0 1px 4px rgba(245, 166, 35, 0.3);
+  position: relative;
+}
+
+body.llm-nikke-chatting .user-message-bubble-color::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  background: #f5a623;
+  clip-path: polygon(0 0, 0% 100%, 100% 100%);
+}
+
+body.llm-nikke-chatting .user-message-bubble-color .whitespace-pre-wrap {
+  color: #fff !important;
+}
+
+/* === Composer accent === */
+body.llm-nikke-chatting form[data-type="unified-composer"] [data-composer-surface="true"] {
+  border: 2px solid #f5a623 !important;
+}
+
+body.llm-nikke-chatting form[data-type="unified-composer"] [data-composer-surface="true"]:focus-within {
+  border-color: #f5a623 !important;
+  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.15);
+}
+
+body.llm-nikke-chatting .composer-submit-button-color {
+  background-color: #f5a623 !important;
+}
+
+/* === Composer: fix dark-on-dark text/buttons === */
+body.llm-nikke-chatting form[data-type="unified-composer"] .composer-btn {
+  color: #fff !important;
+}
+
+body.llm-nikke-chatting form[data-type="unified-composer"] .composer-btn svg {
+  color: #fff !important;
+}
+
+body.llm-nikke-chatting form[data-type="unified-composer"] textarea,
+body.llm-nikke-chatting form[data-type="unified-composer"] [contenteditable],
+body.llm-nikke-chatting form[data-type="unified-composer"] input,
+body.llm-nikke-chatting form[data-type="unified-composer"] p[data-placeholder] {
+  color: #fff !important;
+}
+
+body.llm-nikke-chatting form[data-type="unified-composer"] p[data-placeholder]::before {
+  color: rgba(255, 255, 255, 0.5) !important;
+}

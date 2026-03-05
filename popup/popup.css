@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 240px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+}
+
+.popup-container {
+  padding: 16px;
+}
+
+.popup-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #f5a623;
+  text-align: center;
+}
+
+.popup-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #16213e;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.status-label {
+  font-size: 13px;
+  color: #888;
+}
+
+.status-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5a623;
+  text-transform: uppercase;
+}
+
+.popup-hint {
+  margin: 0;
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  line-height: 1.4;
+}

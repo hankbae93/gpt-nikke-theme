@@ -1,0 +1,39 @@
+#nikke-toggle-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #1a1a2e;
+  color: #888;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99999;
+  border: 2px solid #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+#nikke-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+#nikke-toggle-btn.nikke-toggle--chatting {
+  background: #f5a623;
+  color: #1a1a2e;
+  border-color: #f5a623;
+}
+
+#nikke-toggle-btn.nikke-toggle--vn {
+  background: #fff;
+  color: #1a1a2e;
+  border-color: #fff;
+}

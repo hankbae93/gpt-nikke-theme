@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "LLM NIKKE Theme",
+  "version": "0.1.0",
+  "description": "Transform LLM chat UIs into NIKKE visual novel style",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ],
+      "js": [
+        "src/adapters/base.js",
+        "src/adapters/chatgpt.js",
+        "src/adapters/registry.js",
+        "src/modes/chatting.js",
+        "src/ui/toggle.js",
+        "src/content/main.js"
+      ],
+      "css": [
+        "src/ui/toggle.css",
+        "src/modes/chatting.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*"
+      ],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  }
+}

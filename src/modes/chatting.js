@@ -1,0 +1,116 @@
+/**
+ * ChattingMode - NIKKE Blabla chat theme
+ *
+ * Strategy (StyleGPT pattern):
+ *   1. Toggle html.dark -> html.light globally (activates GPT light variables)
+ *   2. Inject <style> tag with NIKKE custom overrides
+ *   3. Re-apply dark theme to sidebar via CSS
+ *   4. On deactivate, restore original dark/light state
+ */
+class ChattingMode {
+  constructor() {
+    this._active = false;
+    this._styleTag = null;
+  }
+
+  activate() {
+    if (this._active) return;
+    this._active = true;
+
+    this._injectStyleTag();
+    this._applyBgColor();
+    console.log('[NIKKE] Chatting mode activated');
+  }
+
+  deactivate() {
+    if (!this._active) return;
+    this._active = false;
+
+    this._removeBgColor();
+    this._removeStyleTag();
+    console.log('[NIKKE] Chatting mode deactivated');
+  }
+
+  get isActive() {
+    return this._active;
+  }
+
+  _injectStyleTag() {
+    if (this._styleTag) return;
+
+    const topUrl = chrome.runtime.getURL('assets/blabla/top.png');
+    const pfpUrl = chrome.runtime.getURL('assets/profile.png');
+
+    this._styleTag = document.createElement('style');
+    this._styleTag.id = 'nikke-chatting-theme';
+    this._styleTag.textContent = `
+      /* === Assistant profile picture === */
+      body.llm-nikke-chatting [data-message-author-role="assistant"]::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: url("${pfpUrl}") center/cover no-repeat;
+        background-color: #e0ddd8;
+      }
+
+      /* === Scope light theme to thread area only === */
+      body.llm-nikke-chatting #thread {
+        --text-primary: #333;
+        --token-text-primary: #333;
+        --token-text-secondary: #666;
+        color-scheme: light;
+      }
+
+      /* Thread buttons: keep dark text/icons */
+      body.llm-nikke-chatting #thread button.text-token-text-secondary {
+        color: #333 !important;
+      }
+
+      /* === Page header: NIKKE orange banner === */
+      body.llm-nikke-chatting #page-header {
+        background: url("${topUrl}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        border-bottom: 2px solid #c4841a;
+      }
+
+      /* Header buttons/text: white for readability on orange */
+      body.llm-nikke-chatting #page-header button,
+      body.llm-nikke-chatting #page-header a,
+      body.llm-nikke-chatting #page-header span,
+      body.llm-nikke-chatting #page-header svg {
+        color: #fff !important;
+        fill: #fff !important;
+      }
+    `;
+    document.head.appendChild(this._styleTag);
+  }
+
+  _applyBgColor() {
+    const el = document.querySelector('[role="presentation"]');
+    if (el) {
+      this._origBg = el.style.backgroundColor;
+      el.style.backgroundColor = '#f2f2f2';
+    }
+  }
+
+  _removeBgColor() {
+    const el = document.querySelector('[role="presentation"]');
+    if (el) {
+      el.style.backgroundColor = this._origBg || '';
+    }
+  }
+
+  _removeStyleTag() {
+    if (this._styleTag) {
+      this._styleTag.remove();
+      this._styleTag = null;
+    }
+  }
+}
+
+window.ChattingMode = ChattingMode;
