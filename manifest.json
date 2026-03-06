@@ -26,12 +26,14 @@
         "src/adapters/chatgpt.js",
         "src/adapters/registry.js",
         "src/modes/chatting.js",
+        "src/modes/vn.js",
         "src/ui/toggle.js",
         "src/content/main.js"
       ],
       "css": [
         "src/ui/toggle.css",
-        "src/modes/chatting.css"
+        "src/modes/chatting.css",
+        "src/modes/vn.css"
       ],
       "run_at": "document_idle"
     }

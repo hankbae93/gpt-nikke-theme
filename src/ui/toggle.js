@@ -50,8 +50,10 @@ class ToggleUI {
       this.button.title = 'NIKKE Theme: OFF';
     }
 
-    // Persist mode
-    chrome.storage.local.set({ nikkeMode: mode });
+    // Persist mode (guard against invalidated context after extension reload)
+    if (chrome.runtime?.id) {
+      chrome.storage.local.set({ nikkeMode: mode });
+    }
 
     // Notify callback
     if (this.onModeChange) {
@@ -62,6 +64,7 @@ class ToggleUI {
   }
 
   _loadSavedMode() {
+    if (!chrome.runtime?.id) return;
     chrome.storage.local.get('nikkeMode', (result) => {
       const saved = result.nikkeMode || 'off';
       this.currentIndex = this.modes.indexOf(saved);

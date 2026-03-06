@@ -36,9 +36,10 @@
 
 ## Phase 4: Stream Observer + VN 모드
 - [ ] `src/content/stream-observer.js` - StreamObserver
-- [ ] `src/modes/vn.js` - VNMode 클래스
-- [ ] `src/modes/vn.css` - VN 오버레이 스타일
-- [ ] `toggle.js` 업데이트 - VNMode 연동
+- [x] `src/modes/vn.js` - VNMode 클래스
+- [x] `src/modes/vn.css` - VN 오버레이 스타일
+- [x] `toggle.js` 업데이트 - VNMode 연동 (main.js에서 처리)
+- [x] Composer 노출 수정 - body로 reparent + padding-bottom 동기화
 
 ---
 

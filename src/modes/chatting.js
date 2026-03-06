@@ -57,17 +57,24 @@ class ChattingMode {
         background-color: #e0ddd8;
       }
 
-      /* === Scope light theme to thread area only === */
-      body.llm-nikke-chatting #thread {
+      /* === Scope light text to main content area (exclude sidebar & header) === */
+      body.llm-nikke-chatting [role="presentation"] {
         --text-primary: #333;
         --token-text-primary: #333;
+        --text-secondary: #666;
         --token-text-secondary: #666;
+        --token-text-tertiary: #999;
         color-scheme: light;
       }
 
-      /* Thread buttons: keep dark text/icons */
-      body.llm-nikke-chatting #thread button.text-token-text-secondary {
-        color: #333 !important;
+      /* Sidebar: preserve dark theme */
+      body.llm-nikke-chatting #stage-slideover-sidebar {
+        --text-primary: #ececec;
+        --token-text-primary: #ececec;
+        --text-secondary: #b4b4b4;
+        --token-text-secondary: #b4b4b4;
+        --token-text-tertiary: #888;
+        color-scheme: dark;
       }
 
       /* === Page header: NIKKE orange banner === */

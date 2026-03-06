@@ -1,0 +1,471 @@
+/* VN Mode - Full-screen visual novel overlay */
+
+/* Pretendard CDN */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+/* === Overlay container === */
+#nikke-vn-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  /* no transition on overlay itself - padding-bottom on #nikke-vn-bottom handles it */
+  overflow: hidden;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+}
+
+body.llm-nikke-vn #nikke-vn-overlay {
+  display: block;
+}
+
+/* === Background layer === */
+#nikke-vn-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* === Character layer === */
+#nikke-vn-character {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 95dvh;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* === Click zone (covers entire overlay for advancing dialogue) === */
+#nikke-vn-click-zone {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* === Bottom container (holds dialogue) === */
+#nikke-vn-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transition: padding-bottom 0.3s ease;
+}
+
+/* === Dialogue area (gradient background) === */
+#nikke-vn-dialogue-area {
+  width: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 10%,
+    rgba(0, 0, 0, 0.65) 35%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* === Dialogue box (centered, max 1280px) === */
+.nikke-vn-dialogue-box {
+  width: 100%;
+  max-width: 1280px;
+  padding: 20px 40px 40px;
+  position: relative;
+}
+
+/* === Speaker name row === */
+.nikke-vn-speaker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Color bar accent */
+.nikke-vn-color-bar {
+  width: 4px;
+  height: 22px;
+  background: #f5ba36;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(245, 186, 54, 0.5);
+  flex-shrink: 0;
+}
+
+/* Speaker name */
+.nikke-vn-speaker-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 0 4px rgba(245, 186, 54, 0.4);
+  letter-spacing: 0.4px;
+}
+
+/* === Dialogue text (now renders HTML, not plain text) === */
+.nikke-vn-dialogue-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #dcdcdc;
+  line-height: 1.7;
+  letter-spacing: 0.2px;
+  word-break: break-word;
+  min-height: 1.7em;
+  max-height: 40vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 186, 54, 0.3) transparent;
+}
+
+/* === Click indicator (triangle, bottom right of dialogue box) === */
+.nikke-vn-click-indicator {
+  position: absolute;
+  right: 40px;
+  bottom: 8px;
+  color: #f5ba36;
+  font-size: 14px;
+  opacity: 0.7;
+  animation: nikke-vn-blink 1.2s ease-in-out infinite;
+}
+
+.nikke-vn-click-indicator.hidden {
+  display: none;
+}
+
+@keyframes nikke-vn-blink {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.2; }
+}
+
+
+/* === Full view button === */
+.nikke-vn-fullview-btn {
+  position: absolute;
+  right: calc(50% - 600px);
+  bottom: 220px;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(245, 186, 54, 0.5);
+  color: #f5ba36;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  display: none;
+}
+
+.nikke-vn-fullview-btn:hover {
+  background: rgba(245, 186, 54, 0.15);
+  border-color: #f5ba36;
+}
+
+.nikke-vn-fullview-btn.visible {
+  display: block;
+}
+
+/* === Full view panel === */
+#nikke-vn-fullview-panel {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 50vw;
+  z-index: 10;
+  background: rgba(10, 10, 20, 0.95);
+  border-left: 1px solid rgba(245, 186, 54, 0.3);
+  padding: 40px 28px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 186, 54, 0.3) transparent;
+}
+
+#nikke-vn-fullview-panel.open {
+  display: block;
+}
+
+#nikke-vn-fullview-panel .nikke-vn-fullview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#nikke-vn-fullview-panel .nikke-vn-fullview-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f5ba36;
+}
+
+#nikke-vn-fullview-panel .nikke-vn-fullview-close {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+#nikke-vn-fullview-panel .nikke-vn-fullview-close:hover {
+  color: #fff;
+}
+
+#nikke-vn-fullview-panel .nikke-vn-fullview-content {
+  font-size: 16px;
+  font-weight: 500;
+  color: #dcdcdc;
+  line-height: 1.8;
+  letter-spacing: 0.2px;
+  word-break: break-word;
+}
+
+/* === Ensure toggle is above VN overlay === */
+body.llm-nikke-vn #nikke-toggle-btn {
+  z-index: 10000;
+}
+
+
+/* ================================================================
+   Markdown rendering styles - dialogue text + full view panel
+   ================================================================ */
+
+/* --- Shared markdown base (dialogue + fullview) --- */
+.nikke-vn-dialogue-text p,
+.nikke-vn-fullview-content p {
+  margin: 0 0 0.6em;
+}
+
+.nikke-vn-dialogue-text p:last-child,
+.nikke-vn-fullview-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Strong / Bold */
+.nikke-vn-dialogue-text strong,
+.nikke-vn-fullview-content strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Emphasis / Italic */
+.nikke-vn-dialogue-text em,
+.nikke-vn-fullview-content em {
+  color: #e8d5b0;
+  font-style: italic;
+}
+
+/* Inline code */
+.nikke-vn-dialogue-text code,
+.nikke-vn-fullview-content code {
+  background: rgba(245, 186, 54, 0.12);
+  color: #f5ba36;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.9em;
+}
+
+/* Code blocks (pre > code) - override inline code style */
+.nikke-vn-dialogue-text pre,
+.nikke-vn-fullview-content pre {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(245, 186, 54, 0.2);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 8px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 186, 54, 0.3) transparent;
+}
+
+.nikke-vn-dialogue-text pre code,
+.nikke-vn-fullview-content pre code {
+  background: none;
+  color: #d4d4d4;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+/* Lists */
+.nikke-vn-dialogue-text ul,
+.nikke-vn-dialogue-text ol,
+.nikke-vn-fullview-content ul,
+.nikke-vn-fullview-content ol {
+  margin: 4px 0 8px;
+  padding-left: 1.5em;
+}
+
+.nikke-vn-dialogue-text li,
+.nikke-vn-fullview-content li {
+  margin-bottom: 2px;
+}
+
+.nikke-vn-dialogue-text li::marker,
+.nikke-vn-fullview-content li::marker {
+  color: #f5ba36;
+}
+
+/* Headings inside chunks */
+.nikke-vn-dialogue-text h1,
+.nikke-vn-dialogue-text h2,
+.nikke-vn-dialogue-text h3,
+.nikke-vn-dialogue-text h4,
+.nikke-vn-dialogue-text h5,
+.nikke-vn-dialogue-text h6,
+.nikke-vn-fullview-content h1,
+.nikke-vn-fullview-content h2,
+.nikke-vn-fullview-content h3,
+.nikke-vn-fullview-content h4,
+.nikke-vn-fullview-content h5,
+.nikke-vn-fullview-content h6 {
+  color: #fff;
+  font-weight: 700;
+  margin: 0 0 0.4em;
+  line-height: 1.3;
+}
+
+.nikke-vn-dialogue-text h1,
+.nikke-vn-fullview-content h1 { font-size: 1.4em; }
+.nikke-vn-dialogue-text h2,
+.nikke-vn-fullview-content h2 { font-size: 1.25em; }
+.nikke-vn-dialogue-text h3,
+.nikke-vn-fullview-content h3 { font-size: 1.1em; }
+
+/* Blockquote */
+.nikke-vn-dialogue-text blockquote,
+.nikke-vn-fullview-content blockquote {
+  border-left: 3px solid #f5ba36;
+  margin: 6px 0;
+  padding: 4px 12px;
+  color: #bbb;
+  background: rgba(245, 186, 54, 0.05);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Tables */
+.nikke-vn-dialogue-text table,
+.nikke-vn-fullview-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 0.9em;
+}
+
+.nikke-vn-dialogue-text th,
+.nikke-vn-fullview-content th {
+  background: rgba(245, 186, 54, 0.15);
+  color: #f5ba36;
+  font-weight: 600;
+  text-align: left;
+  padding: 6px 10px;
+  border: 1px solid rgba(245, 186, 54, 0.2);
+}
+
+.nikke-vn-dialogue-text td,
+.nikke-vn-fullview-content td {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Links */
+.nikke-vn-dialogue-text a,
+.nikke-vn-fullview-content a {
+  color: #f5ba36;
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 186, 54, 0.4);
+}
+
+.nikke-vn-dialogue-text a:hover,
+.nikke-vn-fullview-content a:hover {
+  text-decoration-color: #f5ba36;
+}
+
+/* Horizontal rule */
+.nikke-vn-dialogue-text hr,
+.nikke-vn-fullview-content hr {
+  border: none;
+  border-top: 1px solid rgba(245, 186, 54, 0.3);
+  margin: 10px 0;
+}
+
+/* Images in content */
+.nikke-vn-dialogue-text img,
+.nikke-vn-fullview-content img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+
+/* ================================================================
+   ChatGPT Composer blending - VN themed input area
+   Pull the composer out of normal flow with position:fixed so it
+   escapes parent stacking contexts and sits above the VN overlay.
+   ================================================================ */
+
+/* Fix composer to bottom, above the overlay (z-index 9998) */
+body.llm-nikke-vn form[data-type="unified-composer"] {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(10, 10, 20, 0.95) !important;
+  border-top: 1px solid rgba(245, 186, 54, 0.25);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+  padding: 12px 16px !important;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+}
+
+/* Style the actual text area */
+body.llm-nikke-vn #prompt-textarea {
+  color: #dcdcdc !important;
+}
+
+/* Composer wrapper backgrounds */
+body.llm-nikke-vn [data-composer-surface="true"] {
+  background: rgba(20, 20, 35, 0.95) !important;
+  border-color: rgba(245, 186, 54, 0.2) !important;
+}
+
+/* Composer buttons (send, attach, etc.) */
+body.llm-nikke-vn form[data-type="unified-composer"] button {
+  color: #999;
+}
+
+body.llm-nikke-vn form[data-type="unified-composer"] button:hover {
+  color: #f5ba36;
+}
+
+/* Hide disclaimer text below composer */
+body.llm-nikke-vn .text-token-text-secondary {
+  display: none !important;
+}
+
+/* Hide conversation thread behind overlay (composer is moved to body by JS) */
+body.llm-nikke-vn #thread {
+  opacity: 0;
+  pointer-events: none;
+}

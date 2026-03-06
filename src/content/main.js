@@ -34,21 +34,27 @@
     console.log('[NIKKE] Thread container found. Initializing UI.');
 
     const chattingMode = new ChattingMode();
+    const vnMode = new VNMode(adapter);
 
     const toggle = new ToggleUI();
     toggle.init((mode) => {
       console.log(`[NIKKE] Mode changed to: ${mode}`);
 
+      // Deactivate all first
+      chattingMode.deactivate();
+      vnMode.deactivate();
+
       if (mode === 'chatting') {
         chattingMode.activate();
-      } else {
-        chattingMode.deactivate();
+      } else if (mode === 'vn') {
+        vnMode.activate();
       }
     });
 
     // Store globally for other modules
     window.nikkeAdapter = adapter;
     window.nikkeChattingMode = chattingMode;
+    window.nikkeVNMode = vnMode;
 
     // Debug: log current thread state
     const turns = adapter.getAllTurns();
