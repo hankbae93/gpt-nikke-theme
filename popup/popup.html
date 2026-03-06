@@ -11,8 +11,70 @@
       <span class="status-label">Mode:</span>
       <span id="current-mode" class="status-value">OFF</span>
     </div>
-    <p class="popup-hint">ChatGPT 페이지에서 우측 하단 N 버튼을 클릭하세요</p>
+
+    <div class="settings-section">
+      <h2 class="settings-heading">Settings</h2>
+
+      <!-- Speaker Name -->
+      <div class="setting-row">
+        <label class="setting-label">Speaker Name</label>
+        <input type="text" id="speaker-name" class="setting-input" placeholder="Enik">
+      </div>
+
+      <!-- Background Image -->
+      <div class="setting-row">
+        <div class="setting-preview-row">
+          <img id="bg-thumb" class="setting-thumb setting-thumb-wide" alt="BG">
+          <div class="setting-info">
+            <span class="setting-label">Background</span>
+            <div class="setting-actions">
+              <button class="setting-btn" data-target="bg-file">Choose</button>
+              <button class="setting-btn setting-btn-reset" id="bg-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="bg-file" accept="image/*" hidden>
+      </div>
+
+      <!-- Character Image -->
+      <div class="setting-row">
+        <div class="setting-preview-row">
+          <img id="char-thumb" class="setting-thumb" alt="Character">
+          <div class="setting-info">
+            <span class="setting-label">Character</span>
+            <div class="setting-actions">
+              <button class="setting-btn" data-target="char-file">Choose</button>
+              <button class="setting-btn setting-btn-reset" id="char-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="char-file" accept="image/*" hidden>
+      </div>
+
+      <!-- Profile Image -->
+      <div class="setting-row">
+        <div class="setting-preview-row">
+          <img id="profile-thumb" class="setting-thumb setting-thumb-round" alt="Profile">
+          <div class="setting-info">
+            <span class="setting-label">Profile</span>
+            <div class="setting-actions">
+              <button class="setting-btn" data-target="profile-file">Choose</button>
+              <button class="setting-btn setting-btn-reset" id="profile-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="profile-file" accept="image/*" hidden>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <button id="save-btn" class="save-btn">Save</button>
+      <button id="reset-all-btn" class="reset-all-btn">Reset All</button>
+    </div>
+
+    <div id="toast" class="toast"></div>
   </div>
+  <script src="../src/storage/image-store.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

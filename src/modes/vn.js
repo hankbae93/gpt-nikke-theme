@@ -7,6 +7,7 @@
  * - Click to advance dialogue like a visual novel
  * - Full View panel shows complete rendered response
  * - Composer themed via CSS to blend with VN overlay (no more show/hide hack)
+ * - Custom images/speaker name loaded from IndexedDB + chrome.storage.local
  */
 class VNMode {
   constructor(adapter) {
@@ -21,6 +22,10 @@ class VNMode {
     this._fullviewBtn = null;
     this._fullviewPanel = null;
     this._fullviewContent = null;
+    this._characterImg = null;
+    this._bgDiv = null;
+    this._speakerNameEl = null;
+    this._speakerAvatar = null;
 
     // Chunk state (HTML chunks)
     this._chunks = [];
@@ -31,16 +36,40 @@ class VNMode {
     this._composerParent = null;
     this._composerNext = null;
 
-    // Bound handler for cleanup
+    // Settings
+    this._settings = { speakerName: 'Enik' };
+    this._imageURLs = {}; // object URLs to revoke on destroy
+
+    // Bound handlers
     this._onClickAdvance = this._onClickAdvance.bind(this);
+    this._onStorageChange = this._onStorageChange.bind(this);
+
+    // Listen for settings changes
+    chrome.storage.onChanged.addListener(this._onStorageChange);
   }
 
   activate() {
     if (this._active) return;
     this._active = true;
+    this._loadSettingsAndBuild();
+  }
+
+  async _loadSettingsAndBuild() {
+    if (!chrome.runtime?.id) return; // extension context invalidated
+
+    // Load text settings
+    const result = await new Promise(resolve => {
+      chrome.storage.local.get('nikkeSettings', resolve);
+    });
+    this._settings = result.nikkeSettings || { speakerName: 'Enik' };
+
+    // Load custom images from IndexedDB
+    await this._loadImageURLs();
 
     if (!this._overlay) {
       this._buildOverlay();
+    } else {
+      this._applySettings();
     }
 
     this._overlay.style.display = 'block';
@@ -48,7 +77,30 @@ class VNMode {
     this._resetChunks();
     this._startPolling();
     this._syncDialoguePadding();
+
+    // Character entrance animation
+    if (this._characterImg) {
+      this._characterImg.classList.remove('entering');
+      // Force reflow to restart animation
+      void this._characterImg.offsetWidth;
+      this._characterImg.classList.add('entering');
+      this._characterImg.addEventListener('animationend', () => {
+        this._characterImg.classList.remove('entering');
+      }, { once: true });
+    }
+
     console.log('[NIKKE] VN mode activated');
+  }
+
+  async _loadImageURLs() {
+    this._imageURLs = {};
+    for (const key of ['background', 'character', 'profile']) {
+      try {
+        this._imageURLs[key] = await ImageStore.loadImage(key);
+      } catch {
+        this._imageURLs[key] = null;
+      }
+    }
   }
 
   deactivate() {
@@ -68,9 +120,15 @@ class VNMode {
     return this._active;
   }
 
+  _getImageURL(key, defaultAsset) {
+    return this._imageURLs[key] || chrome.runtime.getURL(defaultAsset);
+  }
+
   _buildOverlay() {
-    const bgUrl = chrome.runtime.getURL('assets/default_background.webp');
-    const charUrl = chrome.runtime.getURL('assets/default_character.png');
+    const bgUrl = this._getImageURL('background', 'assets/default_background.webp');
+    const charUrl = this._getImageURL('character', 'assets/default_character.png');
+    const profileUrl = this._getImageURL('profile', 'assets/profile.png');
+    const speakerName = this._settings.speakerName || 'Enik';
 
     this._overlay = document.createElement('div');
     this._overlay.id = 'nikke-vn-overlay';
@@ -84,8 +142,9 @@ class VNMode {
         <div id="nikke-vn-dialogue-area">
           <div class="nikke-vn-dialogue-box">
             <div class="nikke-vn-speaker-row">
+              <img class="nikke-vn-speaker-avatar" src="${profileUrl}" alt="">
               <div class="nikke-vn-color-bar"></div>
-              <div class="nikke-vn-speaker-name">Enik</div>
+              <div class="nikke-vn-speaker-name">${speakerName}</div>
             </div>
             <div class="nikke-vn-dialogue-text"></div>
             <div class="nikke-vn-click-indicator">&#9660;</div>
@@ -109,6 +168,10 @@ class VNMode {
     this._fullviewBtn = this._overlay.querySelector('.nikke-vn-fullview-btn');
     this._fullviewPanel = this._overlay.querySelector('#nikke-vn-fullview-panel');
     this._fullviewContent = this._overlay.querySelector('.nikke-vn-fullview-content');
+    this._characterImg = this._overlay.querySelector('#nikke-vn-character');
+    this._bgDiv = this._overlay.querySelector('#nikke-vn-bg');
+    this._speakerNameEl = this._overlay.querySelector('.nikke-vn-speaker-name');
+    this._speakerAvatar = this._overlay.querySelector('.nikke-vn-speaker-avatar');
 
     // Click zone advances dialogue
     const clickZone = this._overlay.querySelector('#nikke-vn-click-zone');
@@ -123,6 +186,36 @@ class VNMode {
       e.stopPropagation();
       this._closeFullView();
     });
+  }
+
+  _applySettings() {
+    if (!this._overlay) return;
+
+    const bgUrl = this._getImageURL('background', 'assets/default_background.webp');
+    const charUrl = this._getImageURL('character', 'assets/default_character.png');
+    const profileUrl = this._getImageURL('profile', 'assets/profile.png');
+    const speakerName = this._settings.speakerName || 'Enik';
+
+    if (this._bgDiv) this._bgDiv.style.backgroundImage = `url('${bgUrl}')`;
+    if (this._characterImg) this._characterImg.src = charUrl;
+    if (this._speakerNameEl) this._speakerNameEl.textContent = speakerName;
+    if (this._speakerAvatar) this._speakerAvatar.src = profileUrl;
+  }
+
+  _onStorageChange(changes, area) {
+    if (!chrome.runtime?.id) return; // extension context invalidated
+    if (area !== 'local' || !this._active) return;
+
+    // Text settings changed
+    if (changes.nikkeSettings) {
+      this._settings = changes.nikkeSettings.newValue || { speakerName: 'Enik' };
+    }
+
+    // Image changed (keys: nikkeImg_background, nikkeImg_character, nikkeImg_profile)
+    const imageChanged = Object.keys(changes).some(k => k.startsWith('nikkeImg_'));
+    if (changes.nikkeSettings || imageChanged) {
+      this._loadImageURLs().then(() => this._applySettings());
+    }
   }
 
   // --- Composer reparenting (escape stacking contexts by moving to body) ---
@@ -163,6 +256,7 @@ class VNMode {
     const h = this._getComposerHeight();
     const bottom = this._overlay.querySelector('#nikke-vn-bottom');
     if (bottom) bottom.style.paddingBottom = h > 0 ? h + 'px' : '0';
+    if (this._fullviewPanel) this._fullviewPanel.style.paddingBottom = h > 0 ? (h + 20) + 'px' : '40px';
   }
 
   // --- Click advance ---
@@ -346,6 +440,8 @@ class VNMode {
 
   destroy() {
     this._stopPolling();
+    chrome.storage.onChanged.removeListener(this._onStorageChange);
+    this._imageURLs = {};
     if (this._overlay) {
       this._overlay.remove();
       this._overlay = null;

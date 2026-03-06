@@ -29,9 +29,9 @@ body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown
   position: relative;
 }
 
-/* Name label above bubble */
+/* Name label above bubble - content set dynamically by chatting.js */
 body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown.prose::before {
-  content: 'Enik';
+  /* content: set via JS injected <style> */
   position: absolute;
   top: -20px;
   left: 0;

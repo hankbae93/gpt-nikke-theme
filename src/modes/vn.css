@@ -43,6 +43,16 @@ body.llm-nikke-vn #nikke-vn-overlay {
   z-index: 1;
 }
 
+/* Character entrance animation */
+@keyframes nikke-vn-character-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+#nikke-vn-character.entering {
+  animation: nikke-vn-character-enter 0.5s ease-out forwards;
+}
+
 /* === Click zone (covers entire overlay for advancing dialogue) === */
 #nikke-vn-click-zone {
   position: absolute;
@@ -105,6 +115,16 @@ body.llm-nikke-vn #nikke-vn-overlay {
   background: #f5ba36;
   border-radius: 2px;
   box-shadow: 0 0 6px rgba(245, 186, 54, 0.5);
+  flex-shrink: 0;
+}
+
+/* Speaker avatar */
+.nikke-vn-speaker-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(245, 186, 54, 0.5);
   flex-shrink: 0;
 }
 

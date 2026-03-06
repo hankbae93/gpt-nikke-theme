@@ -3,7 +3,7 @@
   "name": "LLM NIKKE Theme",
   "version": "0.1.0",
   "description": "Transform LLM chat UIs into NIKKE visual novel style",
-  "permissions": ["storage"],
+  "permissions": ["storage", "unlimitedStorage"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
@@ -22,6 +22,7 @@
         "https://chat.openai.com/*"
       ],
       "js": [
+        "src/storage/image-store.js",
         "src/adapters/base.js",
         "src/adapters/chatgpt.js",
         "src/adapters/registry.js",

@@ -11,15 +11,37 @@ class ChattingMode {
   constructor() {
     this._active = false;
     this._styleTag = null;
+    this._onStorageChange = this._onStorageChange.bind(this);
+    chrome.storage.onChanged.addListener(this._onStorageChange);
   }
 
   activate() {
     if (this._active) return;
     this._active = true;
 
-    this._injectStyleTag();
+    this._loadAndInject();
     this._applyBgColor();
     console.log('[NIKKE] Chatting mode activated');
+  }
+
+  async _loadAndInject() {
+    if (!chrome.runtime?.id) return;
+    const profileDataURL = await ImageStore.loadImage('profile');
+    const result = await new Promise(resolve => {
+      chrome.storage.local.get('nikkeSettings', resolve);
+    });
+    const speakerName = (result.nikkeSettings && result.nikkeSettings.speakerName) || 'Enik';
+    this._injectStyleTag(profileDataURL, speakerName);
+  }
+
+  _onStorageChange(changes, area) {
+    if (!chrome.runtime?.id) return; // extension context invalidated
+    if (area !== 'local' || !this._active) return;
+    const imageChanged = Object.keys(changes).some(k => k.startsWith('nikkeImg_'));
+    if (imageChanged || changes.nikkeSettings) {
+      this._removeStyleTag();
+      this._loadAndInject();
+    }
   }
 
   deactivate() {
@@ -35,11 +57,14 @@ class ChattingMode {
     return this._active;
   }
 
-  _injectStyleTag() {
+  _injectStyleTag(customProfileURL, speakerName) {
     if (this._styleTag) return;
 
     const topUrl = chrome.runtime.getURL('assets/blabla/top.png');
-    const pfpUrl = chrome.runtime.getURL('assets/profile.png');
+    const pfpUrl = customProfileURL || chrome.runtime.getURL('assets/profile.png');
+    const name = speakerName || 'Enik';
+    // Escape single quotes for CSS content
+    const cssName = name.replace(/'/g, "\\'");
 
     this._styleTag = document.createElement('style');
     this._styleTag.id = 'nikke-chatting-theme';
@@ -55,6 +80,11 @@ class ChattingMode {
         border-radius: 50%;
         background: url("${pfpUrl}") center/cover no-repeat;
         background-color: #e0ddd8;
+      }
+
+      /* === Speaker name (dynamic) === */
+      body.llm-nikke-chatting [data-message-author-role="assistant"] > div > .markdown.prose::before {
+        content: '${cssName}';
       }
 
       /* === Scope light text to main content area (exclude sidebar & header) === */

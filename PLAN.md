@@ -1,7 +1,7 @@
 # LLM NIKKE Theme Extension - Progress Tracker
 
-## Current Phase: Phase 4 - Stream Observer + VN 모드
-> Phase 1, 2, 3 완료
+## Current Phase: 완료
+> Phase 1, 2, 3, 4, 5 완료 / 기존 Phase 5(마크다운) 삭제 (ChatGPT 렌더링 HTML 직접 활용으로 불필요)
 
 ---
 
@@ -35,7 +35,7 @@
 ---
 
 ## Phase 4: Stream Observer + VN 모드
-- [ ] `src/content/stream-observer.js` - StreamObserver
+<!-- - [ ] `src/content/stream-observer.js` - StreamObserver (현재 불필요 - VN 모드에서 직접 처리 중) -->
 - [x] `src/modes/vn.js` - VNMode 클래스
 - [x] `src/modes/vn.css` - VN 오버레이 스타일
 - [x] `toggle.js` 업데이트 - VNMode 연동 (main.js에서 처리)
@@ -43,16 +43,10 @@
 
 ---
 
-## Phase 5: 마크다운 렌더링 + 적응형 콘텐츠
-- [ ] `lib/marked.min.js` - 마크다운 라이브러리 번들
-- [ ] `src/content/markdown-renderer.js` - marked.js 래퍼
-- [ ] `vn.js` 업데이트 - 마크다운 렌더링 + 적응형 레이아웃
-- [ ] `vn.css` 업데이트 - 마크다운 스타일
-
----
-
-## Phase 6: 설정, 퍼시스턴스, 폴리싱
-- [ ] `src/ui/settings-panel.js` - 설정 패널
-- [ ] `service-worker.js` 업데이트 - 설정 CRUD
-- [ ] `popup/` 업데이트
-- [ ] 폴리싱 (SPA 대응, 다크모드, 애니메이션)
+## Phase 5: 설정, 퍼시스턴스, 폴리싱
+- [x] `src/storage/image-store.js` - IndexedDB 이미지 저장 헬퍼
+- [x] `service-worker.js` 업데이트 - 설정 CRUD (getSettings/setSettings/resetSettings)
+- [x] `popup/` 업데이트 - 설정 UI (스피커명, 배경/캐릭터/프로필 이미지)
+- [x] `vn.js` 업데이트 - 커스텀 설정 로드/적용, 프로필 아바타, 페이드인 애니메이션
+- [x] `vn.css` 업데이트 - 아바타 스타일, 캐릭터 entrance 애니메이션
+- [x] `manifest.json` 업데이트 - image-store.js content_scripts 등록
