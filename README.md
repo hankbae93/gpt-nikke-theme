@@ -56,6 +56,14 @@ NIKKE 인게임 채팅(블라블라) 스타일의 테마를 적용합니다.
 
 ## 설치
 
+### GitHub Release (권장)
+1. [Releases](https://github.com/hankbae93/gpt-nikke-theme/releases) 페이지에서 최신 ZIP 다운로드
+2. 압축 해제
+3. Chrome에서 `chrome://extensions` 접속
+4. "개발자 모드" 활성화
+5. "압축해제된 확장 프로그램을 로드합니다" 클릭 후 압축 해제한 폴더 선택
+
+### 소스에서 직접 설치
 1. 이 레포지토리를 클론
 2. Chrome에서 `chrome://extensions` 접속
 3. "개발자 모드" 활성화
@@ -86,3 +94,7 @@ popup/          # 확장 프로그램 팝업 (설정 UI)
 - Vanilla JS (번들러 없음)
 - Adapter 패턴으로 멀티 서비스 지원
 - Polling 기반 스트리밍 감지
+
+## Disclaimer
+
+This is an unofficial fan project and is not affiliated with, endorsed by, or associated with SHIFT UP Corporation or GODDESS OF VICTORY: NIKKE in any way. All game-related trademarks, logos, and assets are the property of their respective owners. This extension is free, open-source, and non-commercial.
